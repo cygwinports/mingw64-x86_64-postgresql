@@ -1,0 +1,48 @@
+CROSS_HOST="x86_64-w64-mingw32"
+inherit cross
+
+NAME="mingw64-x86_64-postgresql"
+VERSION=9.3.2
+RELEASE=1
+CATEGORY="Devel"
+SUMMARY="PostgreSQL client libraries for Win64 toolchain"
+DESCRIPTION="PostgreSQL is an advanced object-relational database management
+system that supports an extended subset of the SQL standard, including
+transactions, foreign keys, subqueries, triggers, user-defined types and
+functions.  This distribution also contains C language bindings."
+HOMEPAGE="http://www.postgresql.org/"
+SRC_URI="ftp://ftp.postgresql.org/pub/source/v${VERSION}/postgresql-${VERSION}.tar.bz2"
+SRC_DIR="postgresql-${VERSION}"
+PATCH_URI="9.3-vpath.patch"
+
+NO_AUTOCONF=1
+CYGCONF_ARGS="
+	--with-openssl
+	--enable-thread-safety
+	--enable-integer-datetimes
+	--enable-nls
+	--with-ldap
+	--with-libxml
+	--with-libxslt
+	--with-tcl --with-tclconfig=${CROSS_LIBDIR}
+	ZIC=/usr/sbin/zic
+"
+
+src_install() {
+	cd ${B}
+	cyginstall
+
+	# remove server and support utilties
+	rm -f ${D}${CROSS_BINDIR}/*
+	rm -f ${D}${CROSS_LIBDIR}/pgevent.dll
+	rm -fr ${D}${CROSS_LIBDIR}/postgresql/
+	rm -fr ${D}${CROSS_DATADIR}/{locale,postgresql}/
+
+	pushd ${D}${CROSS_LIBDIR}
+	for dll in lib*.dll
+	do
+		mv ${dll%.dll}.a ${dll}.a
+	done
+	mv lib*.dll ${D}${CROSS_BINDIR}/
+	popd
+}
