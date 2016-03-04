@@ -2,7 +2,7 @@ CROSS_HOST="x86_64-w64-mingw32"
 inherit cross
 
 NAME="mingw64-x86_64-postgresql"
-VERSION=9.3.5
+VERSION=9.5.1
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="PostgreSQL client libraries for Win64 toolchain"
@@ -13,8 +13,12 @@ functions.  This distribution also contains C language bindings."
 HOMEPAGE="http://www.postgresql.org/"
 SRC_URI="ftp://ftp.postgresql.org/pub/source/v${VERSION}/postgresql-${VERSION}.tar.bz2"
 SRC_DIR="postgresql-${VERSION}"
-PATCH_URI="9.3-vpath.patch"
-PATCH_URI+=" http://pkgs.fedoraproject.org/cgit/mingw-postgresql.git/plain/postgresql-9.3.5-plpgsql-link.patch?h=f21"
+PATCH_URI="
+	http://pkgs.fedoraproject.org/cgit/mingw-postgresql.git/plain/postgresql-9.4.0-mingw.patch
+	9.5.1-shlib-def.patch
+"
+
+DISTCLEANFILES="src/bin/pgevent/*dll.def src/interfaces/ecpg/*/*dll.def src/interfaces/libpq/*dll.def"
 
 NO_AUTOCONF=1
 CYGCONF_ARGS="
@@ -34,7 +38,7 @@ src_install() {
 	cyginstall
 
 	# remove server and support utilties
-	rm -f ${D}${CROSS_BINDIR}/*
+	find ${D}${CROSS_BINDIR}/ -mindepth 1 ! -name 'pg_config*' -delete
 	rm -f ${D}${CROSS_LIBDIR}/pgevent.dll
 	rm -fr ${D}${CROSS_LIBDIR}/postgresql/
 	rm -fr ${D}${CROSS_DATADIR}/{locale,postgresql}/
