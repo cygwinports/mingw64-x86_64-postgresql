@@ -2,7 +2,7 @@ CROSS_HOST="x86_64-w64-mingw32"
 inherit cross
 
 NAME="mingw64-x86_64-postgresql"
-VERSION=9.5.1
+VERSION=9.5.4
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="PostgreSQL client libraries for Win64 toolchain"
